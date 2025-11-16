@@ -64,7 +64,7 @@ cd SafeCrossAI_Apps4Athens2025
 Place your trained YOLO model (`best_yolo_model.pt`) in the project directory:
 ```bash
 # Your model should be named: best_yolo_model.pt
-# Place it in the same directory as detect.py
+# Place it in the same directory as piprogram.py
 ```
 
 ### 3. Prepare Test Video
@@ -72,7 +72,7 @@ Place your test video in the project directory (e.g., `Test_Videos/gettyimages-4
 
 ### 4. Run the Detection System
 ```bash
-python3 detect.py
+python3 piprogram.py
 ```
 
 The script will:
