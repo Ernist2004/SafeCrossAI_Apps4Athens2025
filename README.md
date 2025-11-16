@@ -61,43 +61,61 @@ cd SafeCrossAI_Apps4Athens2025
 ```
 
 ### 2. Download YOLO Model
-Place your trained YOLO model (`best.pt`) in the project directory:
+Place your trained YOLO model (`best_yolo_model.pt`) in the project directory:
 ```bash
-mkdir -p yolo_models
-# Copy your model file to yolo_models/best.pt
+# Your model should be named: best_yolo_model.pt
+# Place it in the same directory as detect.py
 ```
 
-### 3. Prepare Test Video (Optional)
-Place your test video in the project directory or use a live camera feed.
+### 3. Prepare Test Video
+Place your test video in the project directory (e.g., `Test_Videos/gettyimages-495919732-640_adpp.mp4`) or use a live camera feed.
 
 ### 4. Run the Detection System
 ```bash
 python3 detect.py
 ```
 
+The script will:
+- Process the video and display real-time detections
+- Save the annotated output to `yolo_output.mp4`
+- Press 'q' to stop early
+
 ---
 
 ## 💻 Code Overview
 
-The main detection script (`detect.py`) performs the following:
+The main detection script (`piprogram.py`) performs the following:
 
 1. **Loads a custom YOLO model** trained to detect wheelchairs, strollers, and pedestrians
 2. **Processes video input** from file or live camera stream
 3. **Runs inference on Raspberry Pi 5 CPU** with optimized image size (480px)
-4. **Displays annotated frames** with bounding boxes and class labels
-5. **Exits on 'q' key press**
+4. **Supports frame skipping** for improved performance (process every Nth frame)
+5. **Saves annotated output video** with bounding boxes and class labels
+6. **Displays real-time preview** with detection results
+7. **Exits on 'q' key press**
+
+### New Features in Latest Version
+- **Video output saving**: Automatically saves processed video to `yolo_output.mp4`
+- **Frame skipping**: Configurable frame skipping for faster processing
+- **Lower confidence threshold**: Set to 0.3 for better detection of edge cases
 
 ### Key Configuration Parameters
 
 ```python
 # Model path
-model_path = "/home/pi/yolo_models/best.pt"
+model_path = "best_yolo_model.pt"
 
 # Confidence threshold (0-1)
-CONF = 0.5
+CONF = 0.3
+
+# Frame skipping for performance (0 = process every frame)
+FRAME_SKIP = 0  # Increase to 1, 2, 3... to skip frames
 
 # Video source (file path or 0 for webcam)
-VIDEO_PATH = "/home/pi/wheelchair_test.mp4"  # or use 0 for live camera
+VIDEO_PATH = "Test_Videos/gettyimages-495919732-640_adpp.mp4"
+
+# Output video path
+OUTPUT_PATH = "yolo_output.mp4"
 
 # Image size for inference (lower = faster, but less accurate)
 model.overrides["imgsz"] = 480  # Try 320 for higher FPS
@@ -109,13 +127,23 @@ model.overrides["imgsz"] = 480  # Try 320 for higher FPS
 
 ### For Better Speed
 - Reduce `imgsz` to 320 or 416
+- Increase `FRAME_SKIP` to 1 or 2 (processes every 2nd or 3rd frame)
 - Lower `CONF` threshold if you're getting too many false positives
 - Use a lighter YOLO model (YOLOv8n instead of YOLOv8s/m/l)
 
 ### For Better Accuracy
+- Set `FRAME_SKIP` to 0 (process every frame)
 - Increase `imgsz` to 640 (default)
 - Use a larger YOLO model variant
-- Adjust `CONF` threshold based on your use case
+- Adjust `CONF` threshold based on your use case (0.3-0.5 recommended)
+
+### Frame Skipping Explained
+```python
+FRAME_SKIP = 0  # Process every frame (slowest, most accurate)
+FRAME_SKIP = 1  # Process every 2nd frame (2x faster)
+FRAME_SKIP = 2  # Process every 3rd frame (3x faster)
+```
+Note: Skipped frames are still written to the output video without annotations to maintain proper timing.
 
 ### Raspberry Pi 5 Specific
 - Enable active cooling to prevent thermal throttling
